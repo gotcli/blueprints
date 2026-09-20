@@ -10,7 +10,7 @@ run without downloading templates at runtime.
 
 ## Requirements
 
-- Go 1.22 or newer
+- Go 1.25 or newer
 
 ## Validation
 
