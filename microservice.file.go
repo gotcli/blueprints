@@ -24,7 +24,8 @@ func main() {
 	loggers, err := logger.Setup(viper.GetString("LOG_DIR"))
 	if err != nil { log.Fatalf("failed to initialize logging: %v", err) }
 	defer loggers.Close()
-	conn := databases.ConnectDB()
+	conn, err := databases.ConnectDB()
+	if err != nil { log.Fatalf("failed to start: %v", err) }
 
 	app := fiber.New(fiber.Config{
 		ReadBufferSize: 8192, BodyLimit:viper.GetInt("HTTP_BODY_LIMIT"), ErrorHandler: response.ErrorHandler,

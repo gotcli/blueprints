@@ -11,7 +11,8 @@ var SQLInterface = `
 		_ "{{ .DBUrl }}"
 	)
 	
-	func ConnectDB() *sql.DB {
+	// ConnectDB opens the database. The returned error never contains the password.
+	func ConnectDB() (*sql.DB, error) {
 
 		dsn := fmt.Sprintf("%s:%s@%s:%s?database=%s",
 			viper.Get("DB_USERNAME"),
@@ -22,10 +23,10 @@ var SQLInterface = `
 
 		db, err := sql.Open("{{ .DBName }}", dsn)
 		if err != nil {
-			panic(err)
+			return nil, fmt.Errorf("open database %s:%v: %w", viper.Get("DB_HOST"), viper.Get("DB_PORT"), err)
 		}
 
-		return db
+		return db, nil
 	}
 `
 
@@ -41,7 +42,8 @@ var ORMInterface = `
 		"gorm.io/gorm"
 	)
 
-	func ConnectDB() *gorm.DB {
+	// ConnectDB opens the database. The returned error never contains the password.
+	func ConnectDB() (*gorm.DB, error) {
 		var dsn string
 		{{- if eq .DBName "postgres" }}
 		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
@@ -62,9 +64,10 @@ var ORMInterface = `
 			Logger:         logger.NewGORMLogger(viper.GetDuration("DB_SLOW_QUERY_THRESHOLD")),
 		})
 		if err != nil {
-			panic(err)
+			return nil, fmt.Errorf("connect to database %s at %s:%d: %w",
+				viper.GetString("DB_NAME"), viper.GetString("DB_HOST"), viper.GetInt("DB_PORT"), err)
 		}
 
-		return conn
+		return conn, nil
 	}
 `

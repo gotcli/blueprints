@@ -25,7 +25,10 @@ func main() {
 	if err != nil { log.Fatalf("failed to initialize logging: %v", err) }
 	defer loggers.Close()
 
-	conn := databases.ConnectDB()
+	conn, err := databases.ConnectDB()
+	if err != nil {
+		log.Fatalf("failed to start: %v", err)
+	}
 
 	app := fiber.New(fiber.Config{
 		ReadBufferSize: 8192,
